@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Captura de Pesagem</title>
+</head>
+<body>
+    <h1>Captura de Pesagem de Caminhão</h1>
+
+    <form method="post" action="/capturar">
+        <div>
+            <label>Modelo do Caminhão:</label>
+            <input type="text" name="modeloCaminhao" required>
+        </div>
+
+        <div>
+            <label>Nome do Balanceiro:</label>
+            <input type="text" name="nomeBalanceiro" required>
+        </div>
+
+        <div>
+            <label>Placa do Veículo:</label>
+            <input type="text" name="placaVeiculo" required>
+        </div>
+
+        <div>
+            <label>Peso Capturado:</label>
+            <input type="text" name="pesoCapturado" id="pesoCapturado" readonly>
+        </div>
+
+        <div>
+            <button type="submit">Capturar</button>
+        </div>
+    </form>
+
+    <form method="post" action="/imprimir">
+        <input type="hidden" name="modeloCaminhao" id="hiddenModeloCaminhao">
+        <input type="hidden" name="nomeBalanceiro" id="hiddenNomeBalanceiro">
+        <input type="hidden" name="placaVeiculo" id="hiddenPlacaVeiculo">
+        <input type="hidden" name="pesoCapturado" id="hiddenPesoCapturado">
+        <div>
+            <button type="submit">Imprimir Relatório</button>
+        </div>
+    </form>
+
+    <script>
+        // Esse script pega os dados preenchidos no primeiro formulário e coloca no segundo
+        document.querySelector('form[action="/capturar"]').onsubmit = function() {
+            document.getElementById('hiddenModeloCaminhao').value = document.querySelector('input[name="modeloCaminhao"]').value;
+            document.getElementById('hiddenNomeBalanceiro').value = document.querySelector('input[name="nomeBalanceiro"]').value;
+            document.getElementById('hiddenPlacaVeiculo').value = document.querySelector('input[name="placaVeiculo"]').value;
+            document.getElementById('hiddenPesoCapturado').value = document.getElementById('pesoCapturado').value;
+        }
+    </script>
+</body>
+</html>
