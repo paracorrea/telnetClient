@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 
 import com.ceasacampinas.telnetClient.enums.TipoPesagem;
 
+import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;

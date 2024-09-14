@@ -2,6 +2,7 @@ package com.ceasacampinas.telnetClient.service;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.math.BigDecimal;
 import java.net.Socket;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -37,6 +38,33 @@ public class TelnetClient {
     private String pesoCapturado;  // Variável para armazenar o peso capturado
 
     // Método para capturar o peso sob demanda
+    
+    public BigDecimal capturarPeso1() {
+        try {
+            // Simulação da captura do peso via socket
+            String pesoBruto = "00000900000";  // Exemplo do que a balança pode enviar
+            System.out.println("Peso recebido bruto: " + pesoBruto);
+
+            // Remover zeros à esquerda e ajustar o formato
+            pesoBruto = pesoBruto.replaceFirst("^0+", "");  // Remove zeros à esquerda
+
+            // Se necessário, remover zeros extras no final
+            pesoBruto = pesoBruto.replaceAll("0+$", "");  // Remove zeros à direita
+
+            System.out.println("Peso processado: " + pesoBruto);
+
+            // Converter a string para BigDecimal, e dividir por 1000 para considerar decimais (se for o caso)
+            BigDecimal pesoFormatado = new BigDecimal(pesoBruto).divide(BigDecimal.valueOf(1000));
+
+            System.out.println("Peso formatado: " + pesoFormatado + " kg");
+
+            return pesoFormatado;  // Retorna o peso formatado
+        } catch (Exception e) {
+            System.err.println("Erro ao processar o peso: " + e.getMessage());
+            return BigDecimal.ZERO;  // Retorna zero em caso de erro
+        }
+    }
+    
     public String capturarPeso() {
         try {
             // Conectando ao IP e porta do equipamento que coleta os dados da balança
@@ -126,54 +154,5 @@ public class TelnetClient {
         }
     }
 
-    
-    	
-        public byte[] gerarPdf(String proprietarioCaminhao, String motoristaCaminhao, String modeloCaminhao,
-                               String nomeBalanceiro, String placaVeiculo, String pesoCapturado) {
-            try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-
-                // Configurando o PDFWriter
-                PdfWriter writer = new PdfWriter(baos);
-                PdfDocument pdf = new PdfDocument(writer);
-                Document document = new Document(pdf, PageSize.A4);
-
-                // Adicionar logo (substitua "logo.png" com o caminho do seu logo)
-                Image logo = new Image(ImageDataFactory.create((getClass().getClassLoader().getResource("logo.png"))));
-                logo.setWidth(UnitValue.createPercentValue(100));  // Ajusta a largura para 100%
-                logo.setHeight(120);  // Altura ajustada para 120px
-                document.add(logo);
-
-                // Adicionar título com borda
-                Paragraph title = new Paragraph("Sistema CEASA de controle de PESO")
-                        .setTextAlignment(TextAlignment.CENTER)
-                        .setBold()
-                        .setFontSize(16);
-                document.add(title);
-
-                // Adicionar linha separadora
-               // document.add(new AreaBreak());
-
-                // Adicionar detalhes
-                document.add(new Paragraph("Proprietário do Caminhão: " + proprietarioCaminhao).setFontSize(12));
-                document.add(new Paragraph("Motorista: " + motoristaCaminhao).setFontSize(12));
-                document.add(new Paragraph("Modelo: " + modeloCaminhao + " - Placa: " + placaVeiculo).setFontSize(12));
-                document.add(new Paragraph("Peso Capturado: " + pesoCapturado).setFontSize(12));
-
-                // Adicionar data atual
-                String dataAtual = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
-                document.add(new Paragraph("Data: " + dataAtual).setFontSize(12));
-
-                // Adicionar nome do balanceiro
-                document.add(new Paragraph("Nome do Balanceiro: " + nomeBalanceiro).setFontSize(12));
-
-                // Adicionar espaço para assinatura
-                document.add(new Paragraph("\n\nAssinatura: ____________________________________").setFontSize(12));
-
-                document.close();
-                return baos.toByteArray();  // Retorna o conteúdo do PDF como byte[]
-            } catch (Exception e) {
-                e.printStackTrace();
-                return null;
-            }
-        }
+	
     }

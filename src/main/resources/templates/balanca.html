@@ -2,59 +2,33 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Captura de Pesagem</title>
+    <title>Cadastro de Pesagem</title>
 </head>
 <body>
-    <h1>Captura de Pesagem de Caminhão</h1>
+    <h1>Cadastro de Pesagem</h1>
 
-    <form method="post" action="/capturar">
+    <form action="#" th:action="@{/balanca/imprimir}" th:object="${balanca}" method="post">
+        
         
         <div>
-            <label>Proprietário do Caminhão:</label>
-            <input type="text" name="proprietarioCaminhao" th:value="${proprietarioCaminhao}" >
+            <label for="destino">Destino:</label>
+            <input type="text" id="destino" th:field="*{destino}" required />
         </div>
         
         <div>
-            <label>Motorista do Caminhão:</label>
-            <input type="text" name="motoristaCaminhao" th:value="${motoristaCaminhao}" required>
-        </div>
-        
-        <div>
-            <label>Modelo do Caminhão:</label>
-            <input type="text" name="modeloCaminhao" th:value="${modeloCaminhao}" required>
-        </div>
-        
-        <div>
-            <label>Placa do Veículo:</label>
-            <input type="text" name="placaVeiculo" th:value="${placaVeiculo}" required>
-        </div>
-        
-        <div>
-            <label>Nome do Balanceiro:</label>
-            <input type="text" name="nomeBalanceiro" th:value="${nomeBalanceiro}" required>
+            <label for="placa">Placa:</label>
+            <input type="text" id="placa" th:field="*{placa}" required />
         </div>
 
         <div>
-            <label>Peso Capturado:</label>
-            <input type="text" name="pesoCapturado" id="pesoCapturado" th:value="${pesoCapturado}" readonly>
+            <label for="valor">Valor:</label>
+            <input type="text" id="valor" th:field="*{valor}" required />
         </div>
 
         <div>
-            <button type="submit">Capturar</button>
+            <button type="submit">Imprimir</button>
         </div>
     </form>
-
-    <form method="post" action="/imprimir">
-        <input type="hidden" name="proprietarioCaminhao" id="hiddenProprietarioCaminhao" th:value="${proprietarioCaminhao}">
-        <input type="hidden" name="motoristaCaminhao" id="hiddenMotoristaCaminhao" th:value="${motoristaCaminhao}">
-        <input type="hidden" name="modeloCaminhao" id="hiddenModeloCaminhao" th:value="${modeloCaminhao}">
-        <input type="hidden" name="placaVeiculo" id="hiddenPlacaVeiculo" th:value="${placaVeiculo}">
-        <input type="hidden" name="nomeBalanceiro" id="hiddenNomeBalanceiro" th:value="${nomeBalanceiro}">
-        <input type="hidden" name="pesoCapturado" id="hiddenPesoCapturado" th:value="${pesoCapturado}">
-        
-        <div>
-            <button type="submit">Imprimir Relatório</button>
-        </div>
-    </form>
+    <p th:text="${mensagem}"></p>
 </body>
 </html>
