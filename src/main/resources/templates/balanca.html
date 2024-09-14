@@ -3,32 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <title>Cadastro de Pesagem</title>
+    <style>
+        /* Estilo personalizado para destacar o peso capturado */
+        .peso-destacado {
+            font-size: 2em;            /* Aumenta o tamanho da fonte */
+            font-weight: bold;         /* Negrito */
+            color: #333;               /* Cor cinza escuro */
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); /* Efeito de relevo */
+            margin-top: 20px;          /* Espaçamento superior */
+        }
+        .peso-label {
+            font-size: 1.2em;
+            color: #555;
+        }
+
+        /* Estilo dos campos de captura */
+        .campo-captura {
+            width: 100%;               /* Largura total do campo */
+            padding: 10px;             /* Aumenta o espaço dentro do campo */
+            font-size: 1.1em;          /* Aumenta o tamanho da fonte */
+            margin-bottom: 15px;       /* Espaçamento entre os campos */
+            border: 1px solid #ccc;    /* Bordas suaves */
+            border-radius: 4px;        /* Bordas arredondadas */
+        }
+
+        /* Estilo do container dos campos */
+        .form-group {
+            margin-bottom: 20px;       /* Espaçamento entre os campos */
+        }
+
+        /* Estilo do botão */
+        button {
+            padding: 10px 20px;        /* Tamanho do botão */
+            font-size: 1.1em;          /* Tamanho da fonte do botão */
+            background-color: #007bff; /* Cor de fundo do botão */
+            color: white;              /* Cor do texto do botão */
+            border: none;              /* Remove bordas padrão */
+            border-radius: 4px;        /* Bordas arredondadas */
+            cursor: pointer;           /* Cursor do mouse ao passar sobre o botão */
+        }
+
+        button:hover {
+            background-color: #0056b3; /* Cor de fundo ao passar o mouse sobre o botão */
+        }
+    </style>
 </head>
 <body>
     <h1>Cadastro de Pesagem</h1>
 
-    <form action="#" th:action="@{/balanca/imprimir}" th:object="${balanca}" method="post">
-        
-        
-        <div>
+    <!-- Exibe o peso capturado com destaque -->
+    <div>
+        <label for="pesoCapturado" class="peso-label">Peso Capturado:</label>
+        <p id="pesoCapturado" th:text="${pesoCapturado} + ' kg'" class="peso-destacado"></p>
+    </div>
+
+    <form action="#" th:action="@{/balanca/imprimirZPL}" th:object="${balanca}" method="post">
+
+        <div class="form-group">
             <label for="destino">Destino:</label>
-            <input type="text" id="destino" th:field="*{destino}" required />
+            <input type="text" id="destino" th:field="*{destino}" class="campo-captura" required />
         </div>
-        
-        <div>
+
+        <div class="form-group">
             <label for="placa">Placa:</label>
-            <input type="text" id="placa" th:field="*{placa}" required />
+            <input type="text" id="placa" th:field="*{placa}" class="campo-captura" required />
         </div>
 
-        <div>
-            <label for="valor">Valor:</label>
-            <input type="text" id="valor" th:field="*{valor}" required />
-        </div>
-
+   <div class="form-group">
+    <label for="valor">Valor (R$):</label>
+    <input type="text" id="valor" th:field="*{valor}" class="campo-captura" required 
+           pattern="^\d{1,3}(?:\.\d{3})*(?:,\d{2})?$" title="Exemplo: 78,99" />
+</div>
         <div>
             <button type="submit">Imprimir</button>
         </div>
     </form>
+    
     <p th:text="${mensagem}"></p>
+    
+<script>
+    document.getElementById('valor').addEventListener('input', function (e) {
+        let value = e.target.value;
+        value = value.replace(/\D/g, ''); // Remove tudo que não é número
+        value = value.replace(/(\d)(\d{2})$/, '$1,$2'); // Coloca a vírgula antes dos últimos dois dígitos
+        value = value.replace(/(?=(\d{3})+(\D))\B/g, '.'); // Coloca pontos a cada milhar
+        e.target.value = value;
+    });
+</script>
 </body>
 </html>

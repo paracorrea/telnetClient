@@ -12,6 +12,7 @@ import javax.print.PrintServiceLookup;
 
 import org.springframework.stereotype.Service;
 
+import com.itextpdf.io.IOException;
 import com.itextpdf.io.image.ImageDataFactory;
 import com.itextpdf.io.source.ByteArrayOutputStream;
 import com.itextpdf.kernel.geom.PageSize;
@@ -28,6 +29,7 @@ import javax.print.*;
 import javax.print.attribute.HashPrintRequestAttributeSet;
 import javax.print.attribute.PrintRequestAttributeSet;
 import java.io.ByteArrayInputStream;
+import java.io.FileWriter;
 import java.io.InputStream;
 
 @Service
@@ -153,6 +155,35 @@ public class TelnetClient {
             e.printStackTrace();
         }
     }
+    public String gerarEtiquetaZPL(String placa, String destino, String valor, String dataPesagem, BigDecimal peso) {
+        String pesoFormatado = String.format("%.3f", peso);
 
-	
+        // Código ZPL gerado dinamicamente com os valores passados
+        String zpl = "^XA\n" +
+                     "^PW480\n" +
+                     "^LL320\n" +
+                     "^FT49,212^A0N,25,28^FH\\^CI28^FDPlaca:^FS^CI27\n" +
+                     "^FT152,215^A0N,28,28^FH\\^CI28^FD" + placa + "^FS^CI27\n" +  // Placa do veículo
+                     "^FT49,182^A0N,28,28^FH\\^CI28^FDDestino:^FS^CI27\n" +
+                     "^FT152,182^A0N,28,28^FH\\^CI28^FD" + destino + "^FS^CI27\n" +  // Destino
+                     "^FT52,255^A0N,25,28^FH\\^CI28^FDValor:^FS^CI27\n" +
+                     "^FT150,254^A0N,28,28^FH\\^CI28^FD" + valor + "^FS^CI27\n" +  // Valor
+                     "^FT125,114^A0N,39,51^FH\\^CI28^FD" + pesoFormatado + " kg^FS^CI27\n" +  // Peso formatado
+                     "^FT381,33^A0N,23,23^FH\\^CI28^FD" + dataPesagem + "^FS^CI27\n" +  // Data de pesagem
+                     "^PQ1,0,1,Y\n" +
+                     "^XZ";
+
+        return zpl;
     }
+
+    public  void salvarEmArquivo(String nomeArquivo, String conteudo) throws java.io.IOException {
+        try (FileWriter writer = new FileWriter(nomeArquivo)) {
+            writer.write(conteudo);
+            System.out.println("Arquivo ZPL salvo com sucesso: " + nomeArquivo);
+        } catch (IOException e) {
+            System.err.println("Erro ao salvar arquivo: " + e.getMessage());
+        }
+    }
+}
+	
+    

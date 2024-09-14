@@ -3,6 +3,8 @@ package com.ceasacampinas.telnetClient.controller;
 import com.ceasacampinas.telnetClient.domain.Balanca;
 import com.ceasacampinas.telnetClient.service.TelnetClient;
 
+import java.beans.PropertyEditorSupport;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -12,7 +14,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -24,20 +28,40 @@ public class BalancaController {
     @Autowired
     private TelnetClient telnetClient;
 
+    @InitBinder
+    public void initBinder(WebDataBinder binder) {
+        binder.registerCustomEditor(BigDecimal.class, new PropertyEditorSupport() {
+            @Override
+            public void setAsText(String text) throws IllegalArgumentException {
+                if (text != null && !text.isEmpty()) {
+                    // Substitui a vírgula por ponto antes de converter para BigDecimal
+                    text = text.replace(".", "").replace(",", ".");
+                    setValue(new BigDecimal(text));
+                } else {
+                    setValue(null);
+                }
+            }
+        });
+    }
+
+    
     @GetMapping("/balanca")
     public String exibirFormularioBalanca(Model model) {
+        // Capturar o peso da balança
+        BigDecimal pesoCapturado = capturarPeso();  // Chama o método para capturar o peso
+
         // Instância de Balanca com valores padrão (caso queira preencher alguns campos previamente)
         Balanca balanca = new Balanca();
         balanca.setDataPesagem(LocalDateTime.now()); // Define a data atual para a pesagem
-        balanca.setPeso(BigDecimal.ZERO);  // Define um valor inicial (ajustável)
+        balanca.setPeso(pesoCapturado);  // Define o peso capturado
         balanca.setContador(new BigDecimal(1));  // Exemplo de contador padrão
 
         // Adiciona a instância ao modelo para que o formulário a utilize
         model.addAttribute("balanca", balanca);
+        model.addAttribute("pesoCapturado", pesoCapturado);  // Passa o peso capturado para o modelo
 
         return "balanca"; // Nome da página HTML do formulário
     }
-    
     @PostMapping("/capturar")
     public String capturarPeso(@RequestParam String proprietarioCaminhao,
                                @RequestParam String motoristaCaminhao,
@@ -96,9 +120,43 @@ public class BalancaController {
         model.addAttribute("mensagem", "Etiqueta impressa com sucesso!");
         return "balanca_sucesso";
     }
+    
+    @PostMapping("/balanca/imprimirZPL")
+    public String imprimirZPL(@ModelAttribute Balanca balanca, Model model) {
+        // Simulação da captura de peso
+        balanca.setPeso(telnetClient.capturarPeso1());
+        balanca.setDataPesagem(LocalDateTime.now());
+
+        // Gera o código ZPL
+        String zpl = telnetClient.gerarEtiquetaZPL(
+            balanca.getPlaca(),
+            balanca.getDestino(),
+            balanca.getValor().toString(),
+            balanca.getDataPesagem().toString(),
+            balanca.getPeso()
+        );
+
+        // Retorna o código ZPL gerado para ser exibido na página
+        model.addAttribute("zplCode", zpl);
+        model.addAttribute("mensagem", "ZPL gerado com sucesso!");
+        
+        try {
+			telnetClient.salvarEmArquivo("zpl.txt", zpl);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        return "balanca";  // Página que exibirá o ZPL gerado
+    }
 
     // Método fictício para capturar o peso
     private BigDecimal capturarPeso() {
         return new BigDecimal("1550.0"); // Simulando o peso da balança
+    }
+    
+    private BigDecimal converterParaBigDecimal(String valor) {
+        // Substitui vírgula por ponto para fazer a conversão correta
+        String valorFormatado = valor.replace(".", "").replace(",", ".");
+        return new BigDecimal(valorFormatado);
     }
 }

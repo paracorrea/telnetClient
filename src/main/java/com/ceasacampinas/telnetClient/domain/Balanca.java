@@ -27,11 +27,11 @@ public class Balanca implements Serializable {
 	private Long id;
 	
 
-	@Digits(integer = 10, fraction =0, message = "O valor deve ter no máximo 10 dígitos inteiros" )
+	//@Digits(integer = 10, fraction =0, message = "O valor deve ter no máximo 10 dígitos inteiros" )
 	private BigDecimal contador;
 	
 
-	@Digits(integer = 10, fraction =1, message = "O valor deve ter no máximo 10 dígitos inteiros e 2 decimal" )
+	//@Digits(integer = 10, fraction =1, message = "O valor deve ter no máximo 10 dígitos inteiros e 2 decimal" )
 	private BigDecimal peso;
 	
 	
@@ -44,7 +44,7 @@ public class Balanca implements Serializable {
 	
 	private String placa;
 	
-	@Digits(integer = 10, fraction =1, message = "O valor deve ter no máximo 10 dígitos inteiros e 2 decimal" )
+	@Digits(integer = 10, fraction =2, message = "O valor deve ter no máximo 10 dígitos inteiros e 2 decimal" )
 	private BigDecimal valor;
 
 	public Long getId() {
