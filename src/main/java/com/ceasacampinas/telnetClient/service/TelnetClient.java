@@ -38,6 +38,7 @@ public class TelnetClient {
     private static final String IP_ADDRESS = "192.168.131.170";  // IP do equipamento
     private static final int PORT = 9000;  // Porta do equipamento
     private String pesoCapturado;  // Variável para armazenar o peso capturado
+    private BigDecimal peso;
 
     // Método para capturar o peso sob demanda
     
@@ -67,7 +68,7 @@ public class TelnetClient {
         }
     }
     
-    public String capturarPeso() {
+    public BigDecimal capturarPeso() {
         try {
             // Conectando ao IP e porta do equipamento que coleta os dados da balança
             Socket socket = new Socket(IP_ADDRESS, PORT);
@@ -77,29 +78,30 @@ public class TelnetClient {
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             pesoCapturado = in.readLine();  // Captura a primeira linha de dados
             
+            BigDecimal peso = new BigDecimal(pesoCapturado).divide(BigDecimal.valueOf(1000));
             
-            
-            System.out.println("Peso recebido: " + pesoCapturado);
+            System.out.println("Peso recebido: " + peso);
            
 
             socket.close();
         } catch (Exception e) {
             System.err.println("Erro ao conectar ao equipamento: " + e.getMessage());
-            pesoCapturado = null;  // Caso haja erro, o peso será null
+            peso = null;  // Caso haja erro, o peso será null
         }
 
-        return pesoCapturado;  // Retorna o peso capturado para ser utilizado na aplicação
+        return peso;  // Retorna o peso capturado para ser utilizado na aplicação
     }
 
-    public String getPesoCapturado() {
-        return pesoCapturado;
+    public BigDecimal getPesoCapturado() {
+        return peso;
     }
     
     public void imprimirEtiqueta(String placa, String destino, String valor, String data, String hora) {
         // Obter o peso capturado
-        String peso = getPesoCapturado();
+        BigDecimal peso = getPesoCapturado();
         if (peso == null) {
-            peso = "Erro na captura do peso";  // Tratar o caso de falha na captura do peso
+        	System.out.println("Erro na captura do peso");  // Tratar o caso de falha na captura do peso
+        	
         }
         
         // Gerar o comando ZPL

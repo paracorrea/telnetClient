@@ -47,9 +47,10 @@ public class BalancaController {
     
     @GetMapping("/balanca")
     public String exibirFormularioBalanca(Model model) {
-        // Capturar o peso da balança
-        BigDecimal pesoCapturado = capturarPeso();  // Chama o método para capturar o peso
-
+        // Capturar o peso da balançagi
+        //BigDecimal pesoCapturado = capturarPeso();  // Chama o método de teste para capturar o peso
+    	BigDecimal pesoCapturado = telnetClient.capturarPeso(); // metodo correto
+       
         // Instância de Balanca com valores padrão (caso queira preencher alguns campos previamente)
         Balanca balanca = new Balanca();
         balanca.setDataPesagem(LocalDateTime.now()); // Define a data atual para a pesagem
@@ -70,9 +71,9 @@ public class BalancaController {
                                @RequestParam String placaVeiculo,
                                Model model) {
         // Chama o service para capturar o peso da balança
-        String pesoCapturado = telnetClient.capturarPeso();
+        BigDecimal pesoCapturado = telnetClient.capturarPeso();
         if (pesoCapturado == null) {
-            pesoCapturado = "";
+            System.out.println("Erro peso não capturado");
         }
 
         // Adiciona os dados ao modelo com nomes corretos para evitar sobrescrever
@@ -83,7 +84,7 @@ public class BalancaController {
         model.addAttribute("placaVeiculo", placaVeiculo);
         model.addAttribute("pesoCapturado", pesoCapturado);
 
-        return "balanca";  // Retorna à página com os dados
+        return "redirect:/balanca";  // Retorna à página com os dados
     }
 
     @GetMapping("/teste-impressao")
@@ -103,7 +104,7 @@ public class BalancaController {
     @PostMapping("/balanca/imprimir")
     public String imprimirBalanca(@ModelAttribute Balanca balanca, Model model) {
         // Preenche os dados automáticos do sistema
-        balanca.setPeso(telnetClient.capturarPeso1()); // Método fictício para capturar peso
+        balanca.setPeso(telnetClient.capturarPeso()); // Método fictício para capturar peso
         balanca.setDataPesagem(LocalDateTime.now()); // Captura a data e hora atuais
         balanca.setContador(new BigDecimal(1)); // Exemplo de contador
 
@@ -122,9 +123,11 @@ public class BalancaController {
     }
     
     @PostMapping("/balanca/imprimirZPL")
-    public String imprimirZPL(@ModelAttribute Balanca balanca, Model model) {
+    public String imprimirZPL(@ModelAttribute Balanca balanca, Model model) throws IOException {
         // Simulação da captura de peso
-        balanca.setPeso(telnetClient.capturarPeso1());
+        
+    	balanca.setPeso(capturarPeso());
+    	//balanca.setPeso(telnetClient.capturarPeso());
         balanca.setDataPesagem(LocalDateTime.now());
 
         // Gera o código ZPL
@@ -140,12 +143,7 @@ public class BalancaController {
         model.addAttribute("zplCode", zpl);
         model.addAttribute("mensagem", "ZPL gerado com sucesso!");
         
-        try {
-			telnetClient.salvarEmArquivo("zpl.txt", zpl);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+        telnetClient.salvarEmArquivo("zpl.txt", zpl);
         return "redirect:/balanca";  // Página que exibirá o ZPL gerado
     }
 
