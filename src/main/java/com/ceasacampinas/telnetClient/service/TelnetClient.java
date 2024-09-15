@@ -48,10 +48,10 @@ public class TelnetClient {
             System.out.println("Peso recebido bruto: " + pesoBruto);
 
             // Remover zeros à esquerda e ajustar o formato
-            pesoBruto = pesoBruto.replaceFirst("^0+", "");  // Remove zeros à esquerda
+            //pesoBruto = pesoBruto.replaceFirst("^0+", "");  // Remove zeros à esquerda
 
             // Se necessário, remover zeros extras no final
-            pesoBruto = pesoBruto.replaceAll("0+$", "");  // Remove zeros à direita
+            //pesoBruto = pesoBruto.replaceAll("0+$", "");  // Remove zeros à direita
 
             System.out.println("Peso processado: " + pesoBruto);
 
@@ -156,7 +156,7 @@ public class TelnetClient {
         }
     }
     public String gerarEtiquetaZPL(String placa, String destino, String valor, String dataPesagem, BigDecimal peso) {
-        String pesoFormatado = String.format("%.3f", peso);
+      //  String pesoFormatado = String.format("%.3f", peso);
 
         // Código ZPL gerado dinamicamente com os valores passados
         String zpl = "^XA\n" +
@@ -168,7 +168,7 @@ public class TelnetClient {
                      "^FT152,182^A0N,28,28^FH\\^CI28^FD" + destino + "^FS^CI27\n" +  // Destino
                      "^FT52,255^A0N,25,28^FH\\^CI28^FDValor:^FS^CI27\n" +
                      "^FT150,254^A0N,28,28^FH\\^CI28^FD" + valor + "^FS^CI27\n" +  // Valor
-                     "^FT125,114^A0N,39,51^FH\\^CI28^FD" + pesoFormatado + " kg^FS^CI27\n" +  // Peso formatado
+                     "^FT125,114^A0N,39,51^FH\\^CI28^FD" + peso + " kg^FS^CI27\n" +  // Peso formatado
                      "^FT381,33^A0N,23,23^FH\\^CI28^FD" + dataPesagem + "^FS^CI27\n" +  // Data de pesagem
                      "^PQ1,0,1,Y\n" +
                      "^XZ";

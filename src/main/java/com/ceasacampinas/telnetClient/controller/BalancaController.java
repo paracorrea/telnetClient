@@ -146,7 +146,7 @@ public class BalancaController {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-        return "balanca";  // Página que exibirá o ZPL gerado
+        return "redirect:/balanca";  // Página que exibirá o ZPL gerado
     }
 
     // Método fictício para capturar o peso
