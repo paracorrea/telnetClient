@@ -48,8 +48,9 @@ public class BalancaController {
     @GetMapping("/balanca")
     public String exibirFormularioBalanca(Model model) {
         // Capturar o peso da balançagi
-        //BigDecimal pesoCapturado = capturarPeso();  // Chama o método de teste para capturar o peso
-    	BigDecimal pesoCapturado = telnetClient.capturarPeso(); // metodo correto
+       
+    	BigDecimal pesoCapturado = capturarPeso();  // Chama o método de teste para capturar o peso
+    	//BigDecimal pesoCapturado = telnetClient.capturarPeso(); // metodo correto
        
         // Instância de Balanca com valores padrão (caso queira preencher alguns campos previamente)
         Balanca balanca = new Balanca();
@@ -135,7 +136,7 @@ public class BalancaController {
             balanca.getPlaca(),
             balanca.getDestino(),
             balanca.getValor().toString(),
-            balanca.getDataPesagem().toString(),
+            balanca.getDataPesagem(),
             balanca.getPeso()
         );
 
@@ -149,7 +150,7 @@ public class BalancaController {
 
     // Método fictício para capturar o peso
     private BigDecimal capturarPeso() {
-        return new BigDecimal("1550.0"); // Simulando o peso da balança
+        return new BigDecimal("1550"); // Simulando o peso da balança
     }
     
     private BigDecimal converterParaBigDecimal(String valor) {

@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.net.Socket;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
 
 import javax.print.PrintService;
 import javax.print.PrintServiceLookup;
@@ -13,8 +14,7 @@ import javax.print.PrintServiceLookup;
 import org.springframework.stereotype.Service;
 
 import com.itextpdf.io.IOException;
-import com.itextpdf.io.image.ImageDataFactory;
-import com.itextpdf.io.source.ByteArrayOutputStream;
+
 import com.itextpdf.kernel.geom.PageSize;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
@@ -106,15 +106,15 @@ public class TelnetClient {
         
         // Gerar o comando ZPL
         String zpl = "^XA\n" +
-                     "^FT49,212^A0N,25,28^FH\\^CI28^FDPlaca:^FS^CI27\n" +
+                     "^FT30,212^A0N,25,28^FH\\^CI28^FDPlaca:^FS^CI27\n" +
                      "^FT152,215^A0N,28,28^FH\\^CI28^FD" + placa + "^FS^CI27\n" +
-                     "^FT49,182^A0N,28,28^FH\\^CI28^FDDestino:^FS^CI27\n" +
+                     "^FT30,182^A0N,28,28^FH\\^CI28^FDDestino:^FS^CI27\n" +
                      "^FT152,182^A0N,28,28^FH\\^CI28^FD" + destino + "^FS^CI27\n" +
-                     "^FT52,255^A0N,25,28^FH\\^CI28^FDValor:^FS^CI27\n" +
+                     "^FT30,255^A0N,25,28^FH\\^CI28^FDValor:^FS^CI27\n" +
                      "^FT150,254^A0N,28,28^FH\\^CI28^FD" + valor + "^FS^CI27\n" +
                      "^FT125,114^A0N,39,51^FH\\^CI28^FD" + peso + " kg^FS^CI27\n" +
-                     "^FT381,33^A0N,23,23^FH\\^CI28^FD" + hora + "^FS^CI27\n" +
-                     "^FT361,55^A0N,23,23^FH\\^CI28^FD" + data + "^FS^CI27\n" +
+                     "^FT30,33^A0N,23,23^FH\\^CI28^FD" + hora + "^FS^CI27\n" +
+                     "^FT30,55^A0N,23,23^FH\\^CI28^FD" + data + "^FS^CI27\n" +
                      "^PQ1,0,1,Y\n" +
                      "^XZ";
 
@@ -157,26 +157,35 @@ public class TelnetClient {
             e.printStackTrace();
         }
     }
-    public String gerarEtiquetaZPL(String placa, String destino, String valor, String dataPesagem, BigDecimal peso) {
+    public <LocalDataTime> String gerarEtiquetaZPL(String placa, String destino, String valor, LocalDateTime  dataPesagem, BigDecimal peso) {
       //  String pesoFormatado = String.format("%.3f", peso);
 
-        // Código ZPL gerado dinamicamente com os valores passados
-        String zpl = "^XA\n" +
-                     "^PW480\n" +
-                     "^LL320\n" +
-                     "^FT49,212^A0N,25,28^FH\\^CI28^FDPlaca:^FS^CI27\n" +
-                     "^FT152,215^A0N,28,28^FH\\^CI28^FD" + placa + "^FS^CI27\n" +  // Placa do veículo
-                     "^FT49,182^A0N,28,28^FH\\^CI28^FDDestino:^FS^CI27\n" +
-                     "^FT152,182^A0N,28,28^FH\\^CI28^FD" + destino + "^FS^CI27\n" +  // Destino
-                     "^FT52,255^A0N,25,28^FH\\^CI28^FDValor:^FS^CI27\n" +
-                     "^FT150,254^A0N,28,28^FH\\^CI28^FD" + valor + "^FS^CI27\n" +  // Valor
-                     "^FT125,114^A0N,39,51^FH\\^CI28^FD" + peso + " kg^FS^CI27\n" +  // Peso formatado
-                     "^FT381,33^A0N,23,23^FH\\^CI28^FD" + dataPesagem + "^FS^CI27\n" +  // Data de pesagem
-                     "^PQ1,0,1,Y\n" +
-                     "^XZ";
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        String dataFormatada =  dataPesagem.format(dateFormatter);  // Usa 'format()' para a data
 
-        return zpl;
-    }
+        // Formata a hora como "HH:mm"
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+        String horaFormatada = dataPesagem.format(timeFormatter);  // Usa 'format()' para a hora
+
+
+    	    // Código ZPL gerado dinamicamente com os valores passados
+    	    String zpl = "^XA\n" +
+    	                 "^PW480\n" +
+    	                 "^LL320\n" +
+    	                 "^FT30,212^A0N,23,25^FH\\^CI28^FDPlaca:^FS^CI27\n" +
+    	                 "^FT115,215^A0N,23,25^FH\\^CI28^FD" + placa + "^FS^CI27\n" +  // Placa do veículo
+    	                 "^FT30,182^A0N,23,25^FH\\^CI28^FDDestino:^FS^CI27\n" +
+    	                 "^FT115,182^A0N,23,25^FH\\^CI28^FD" + destino + "^FS^CI27\n" +  // Destino
+    	                 "^FT30,255^A0N,23,25^FH\\^CI28^FDValor:^FS^CI27\n" +
+    	                 "^FT115,254^A0N,23,25^FH\\^CI28^FD" + valor + "^FS^CI27\n" +  // Valor
+    	                 "^FT125,114^A0N,39,51^FH\\^CI28^FD" + peso + "kg^FS^CI27\n" +  // Peso
+    	                 "^FT30,33^A0N,23,23^FH\\^CI28^FD" + dataFormatada + "^FS^CI27\n" +  // Data formatada
+    	                 "^FT30,55^A0N,23,23^FH\\^CI28^FD" + horaFormatada + "^FS^CI27\n" +  // Hora formatada
+    	                 "^PQ1,0,1,Y\n" +
+    	                 "^XZ";
+
+    	    return zpl;
+    	}
 
     public  void salvarEmArquivo(String nomeArquivo, String conteudo) throws java.io.IOException {
         try (FileWriter writer = new FileWriter(nomeArquivo)) {
