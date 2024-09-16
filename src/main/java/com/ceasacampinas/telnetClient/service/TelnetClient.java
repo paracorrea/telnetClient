@@ -7,6 +7,7 @@ import java.net.Socket;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
+import java.util.Properties;
 
 import javax.print.PrintService;
 import javax.print.PrintServiceLookup;
@@ -29,44 +30,44 @@ import javax.print.*;
 import javax.print.attribute.HashPrintRequestAttributeSet;
 import javax.print.attribute.PrintRequestAttributeSet;
 import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.InputStream;
 
 @Service
 public class TelnetClient {
 
+	 private static final String CONTADOR_PATH = "contador.properties";
     private static final String IP_ADDRESS = "192.168.131.170";  // IP do equipamento
     private static final int PORT = 9000;  // Porta do equipamento
     private String pesoCapturado;  // Variável para armazenar o peso capturado
     public BigDecimal peso;
 
     // Método para capturar o peso sob demanda
+    private int lerContador() {
+        Properties prop = new Properties();
+        int contador = 1; // Valor inicial padrão
+        try (FileInputStream input = new FileInputStream(CONTADOR_PATH)) {
+            prop.load(input);
+            contador = Integer.parseInt(prop.getProperty("contador"));
+        } catch (IOException | java.io.IOException e) {
+            System.out.println("Erro ao ler o arquivo de contador: " + e.getMessage());
+        }
+        return contador;
+    }
     
-    public BigDecimal capturarPeso1() {
-        try {
-            // Simulação da captura do peso via socket
-            String pesoBruto = "00000900000";  // Exemplo do que a balança pode enviar
-            System.out.println("Peso recebido bruto: " + pesoBruto);
-
-            // Remover zeros à esquerda e ajustar o formato
-            //pesoBruto = pesoBruto.replaceFirst("^0+", "");  // Remove zeros à esquerda
-
-            // Se necessário, remover zeros extras no final
-            //pesoBruto = pesoBruto.replaceAll("0+$", "");  // Remove zeros à direita
-
-            System.out.println("Peso processado: " + pesoBruto);
-
-            // Converter a string para BigDecimal, e dividir por 1000 para considerar decimais (se for o caso)
-            BigDecimal pesoFormatado = new BigDecimal(pesoBruto).divide(BigDecimal.valueOf(1000));
-
-            System.out.println("Peso formatado: " + pesoFormatado + " kg");
-
-            return pesoFormatado;  // Retorna o peso formatado
-        } catch (Exception e) {
-            System.err.println("Erro ao processar o peso: " + e.getMessage());
-            return BigDecimal.ZERO;  // Retorna zero em caso de erro
+    private void salvarContador(int contador) throws FileNotFoundException, java.io.IOException {
+        Properties prop = new Properties();
+        try (FileOutputStream output = new FileOutputStream(CONTADOR_PATH)) {
+            prop.setProperty("contador", String.valueOf(contador));
+            prop.store(output, null);
+        } catch (IOException e) {
+            System.out.println("Erro ao salvar o contador: " + e.getMessage());
         }
     }
+   
     
     public BigDecimal capturarPeso() {
         BigDecimal peso = BigDecimal.ZERO;
@@ -102,6 +103,8 @@ public class TelnetClient {
     public void imprimirEtiqueta(String placa, String destino, String valor, LocalDateTime dataPesagem, BigDecimal peso) {
         // Obter o peso capturado
        
+    	 int contador = lerContador();
+    	
     	 BigDecimal pesokg = peso.divide(BigDecimal.valueOf(1000));  // Dividir por 1000 para converter gramas para kg
     	
         if (pesokg == null) {
@@ -127,11 +130,24 @@ public class TelnetClient {
                 "^FT125,114^A0N,39,51^FH\\^CI28^FD" + pesokg + "kg^FS^CI27\n" +  // Peso
                 "^FT30,33^A0N,23,23^FH\\^CI28^FD" + dataFormatada + "^FS^CI27\n" +  // Data formatada
                 "^FT30,55^A0N,23,23^FH\\^CI28^FD" + horaFormatada + "^FS^CI27\n" +  // Hora formatada
-                "^PQ1,0,1,Y\n" +
+                "^FT30,300^A0N,18,18^FH\\^CI28^FDContador: " + contador + "^FS^CI27\n" +  // Contador
+                "^PQ2,0,1,Y\n" +
                 "^XZ";
 
         // Enviar o comando ZPL para a impressora
        imprimirViaUSB(zpl);
+       
+       // Incrementar o contador e salvar de volta no arquivo
+       contador++;
+       try {
+		salvarContador(contador);
+	} catch (FileNotFoundException e) {
+		System.out.println("Erro file not found exception");
+		e.printStackTrace();
+	} catch (java.io.IOException e) {
+		System.out.println("Erro javaio exceexception");
+		e.printStackTrace();
+	}
     }
     
     public void imprimirViaUSB(String zplComando) {
