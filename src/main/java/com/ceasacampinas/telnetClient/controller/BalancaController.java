@@ -49,15 +49,16 @@ public class BalancaController {
     public String exibirFormularioBalanca(Model model) {
         // Capturar o peso da balançagi
        
-    	BigDecimal pesoCapturado = capturarPeso();  // Chama o método de teste para capturar o peso
-    	//BigDecimal pesoCapturado = telnetClient.capturarPeso(); // metodo correto
-       
+    	 //BigDecimal pesoCapturado = capturarPeso();  // Chama o método de teste para capturar o peso
+    	BigDecimal pesoCapturado = telnetClient.capturarPeso(); // metodo correto
+    	 // BigDecimal peso = new BigDecimal(pesoCapturado).divide(BigDecimal.valueOf(1000));
         // Instância de Balanca com valores padrão (caso queira preencher alguns campos previamente)
         Balanca balanca = new Balanca();
         balanca.setDataPesagem(LocalDateTime.now()); // Define a data atual para a pesagem
         balanca.setPeso(pesoCapturado);  // Define o peso capturado
         balanca.setContador(new BigDecimal(1));  // Exemplo de contador padrão
 
+        System.out.println("Peso capturado no controller: "+pesoCapturado);
         // Adiciona a instância ao modelo para que o formulário a utilize
         model.addAttribute("balanca", balanca);
         model.addAttribute("pesoCapturado", pesoCapturado);  // Passa o peso capturado para o modelo
@@ -88,46 +89,40 @@ public class BalancaController {
         return "redirect:/balanca";  // Retorna à página com os dados
     }
 
-    @GetMapping("/teste-impressao")
-    @ResponseBody
-    public String testarImpressao() {
-    	 String placa = "BAV-3232";
-         String destino = "JARI FRUTAS";
-         String valor = "R$ 17,88";
-         String peso = "1.550 kg";  // Peso fixo para teste
-         String data = "13/06/2022";
-         String hora = "13:06:26";
-        telnetClient.imprimirEtiqueta(placa, destino,valor, data, hora);
-        return "Teste de impressão enviado para a impressora!";
-    }
+   
 
     
     @PostMapping("/balanca/imprimir")
     public String imprimirBalanca(@ModelAttribute Balanca balanca, Model model) {
         // Preenche os dados automáticos do sistema
-        balanca.setPeso(telnetClient.capturarPeso()); // Método fictício para capturar peso
+       
+    	balanca.setPeso(telnetClient.capturarPeso());
+        
+      
+     
         balanca.setDataPesagem(LocalDateTime.now()); // Captura a data e hora atuais
         balanca.setContador(new BigDecimal(1)); // Exemplo de contador
 
         // Envia para impressão
         telnetClient.imprimirEtiqueta(
-            balanca.getPlaca(),
-            balanca.getDestino(),
-            balanca.getValor().toString(),
-            balanca.getDataPesagem().toString(),
-            balanca.getPeso().toString()
+        		 balanca.getPlaca(),
+                 balanca.getDestino(),
+                 balanca.getValor().toString(),
+                 balanca.getDataPesagem(),
+                 balanca.getPeso()
+            
         );
 
         // Retorna uma mensagem de sucesso
         model.addAttribute("mensagem", "Etiqueta impressa com sucesso!");
-        return "balanca_sucesso";
+        return "redirect:/balanca";
     }
     
     @PostMapping("/balanca/imprimirZPL")
     public String imprimirZPL(@ModelAttribute Balanca balanca, Model model) throws IOException {
         // Simulação da captura de peso
         
-    	balanca.setPeso(capturarPeso());
+    	balanca.setPeso(telnetClient.capturarPeso());
     	//balanca.setPeso(telnetClient.capturarPeso());
         balanca.setDataPesagem(LocalDateTime.now());
 
@@ -149,10 +144,7 @@ public class BalancaController {
     }
 
     // Método fictício para capturar o peso
-    private BigDecimal capturarPeso() {
-        return new BigDecimal("1550"); // Simulando o peso da balança
-    }
-    
+   
     private BigDecimal converterParaBigDecimal(String valor) {
         // Substitui vírgula por ponto para fazer a conversão correta
         String valorFormatado = valor.replace(".", "").replace(",", ".");

@@ -38,7 +38,7 @@ public class TelnetClient {
     private static final String IP_ADDRESS = "192.168.131.170";  // IP do equipamento
     private static final int PORT = 9000;  // Porta do equipamento
     private String pesoCapturado;  // Variável para armazenar o peso capturado
-    private BigDecimal peso;
+    public BigDecimal peso;
 
     // Método para capturar o peso sob demanda
     
@@ -69,6 +69,7 @@ public class TelnetClient {
     }
     
     public BigDecimal capturarPeso() {
+        BigDecimal peso = BigDecimal.ZERO;
         try {
             // Conectando ao IP e porta do equipamento que coleta os dados da balança
             Socket socket = new Socket(IP_ADDRESS, PORT);
@@ -76,47 +77,58 @@ public class TelnetClient {
 
             // Lendo o dado de peso enviado pelo equipamento
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            pesoCapturado = in.readLine();  // Captura a primeira linha de dados
+            String pesoCapturado = in.readLine();  // Captura a primeira linha de dados
+
+            // Remover caracteres não numéricos (exceto ponto ou vírgula, se necessário)
+            String pesoFiltrado = pesoCapturado.replaceAll("[^\\d]", ""); // Mantém apenas os dígitos
             
-            BigDecimal peso = new BigDecimal(pesoCapturado).divide(BigDecimal.valueOf(1000));
+            if (!pesoFiltrado.isEmpty()) {
+                // Convertendo a string para BigDecimal, assumindo que o peso está em gramas e dividindo por 1000 para obter em kg
+                peso = new BigDecimal(pesoFiltrado).divide(BigDecimal.valueOf(1000));
+            }
             
             System.out.println("Peso recebido: " + peso);
-           
-
             socket.close();
         } catch (Exception e) {
             System.err.println("Erro ao conectar ao equipamento: " + e.getMessage());
-            peso = null;  // Caso haja erro, o peso será null
         }
 
         return peso;  // Retorna o peso capturado para ser utilizado na aplicação
     }
-
     public BigDecimal getPesoCapturado() {
         return peso;
     }
     
-    public void imprimirEtiqueta(String placa, String destino, String valor, String data, String hora) {
+    public void imprimirEtiqueta(String placa, String destino, String valor, LocalDateTime dataPesagem, BigDecimal peso) {
         // Obter o peso capturado
-        BigDecimal peso = getPesoCapturado();
-        if (peso == null) {
+       
+    	 BigDecimal pesokg = peso.divide(BigDecimal.valueOf(1000));  // Dividir por 1000 para converter gramas para kg
+    	
+        if (pesokg == null) {
         	System.out.println("Erro na captura do peso");  // Tratar o caso de falha na captura do peso
         	
         }
-        
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        String dataFormatada =  dataPesagem.format(dateFormatter);  // Usa 'format()' para a data
+
+        // Formata a hora como "HH:mm"
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+        String horaFormatada = dataPesagem.format(timeFormatter);  // Usa 'format()' para a hora
         // Gerar o comando ZPL
         String zpl = "^XA\n" +
-                     "^FT30,212^A0N,25,28^FH\\^CI28^FDPlaca:^FS^CI27\n" +
-                     "^FT152,215^A0N,28,28^FH\\^CI28^FD" + placa + "^FS^CI27\n" +
-                     "^FT30,182^A0N,28,28^FH\\^CI28^FDDestino:^FS^CI27\n" +
-                     "^FT152,182^A0N,28,28^FH\\^CI28^FD" + destino + "^FS^CI27\n" +
-                     "^FT30,255^A0N,25,28^FH\\^CI28^FDValor:^FS^CI27\n" +
-                     "^FT150,254^A0N,28,28^FH\\^CI28^FD" + valor + "^FS^CI27\n" +
-                     "^FT125,114^A0N,39,51^FH\\^CI28^FD" + peso + " kg^FS^CI27\n" +
-                     "^FT30,33^A0N,23,23^FH\\^CI28^FD" + hora + "^FS^CI27\n" +
-                     "^FT30,55^A0N,23,23^FH\\^CI28^FD" + data + "^FS^CI27\n" +
-                     "^PQ1,0,1,Y\n" +
-                     "^XZ";
+                "^PW480\n" +
+                "^LL320\n" +
+                "^FT30,212^A0N,23,25^FH\\^CI28^FDPlaca:^FS^CI27\n" +
+                "^FT115,215^A0N,23,25^FH\\^CI28^FD" + placa + "^FS^CI27\n" +  // Placa do veículo
+                "^FT30,182^A0N,23,25^FH\\^CI28^FDDestino:^FS^CI27\n" +
+                "^FT115,182^A0N,23,25^FH\\^CI28^FD" + destino + "^FS^CI27\n" +  // Destino
+                "^FT30,255^A0N,23,25^FH\\^CI28^FDValor:^FS^CI27\n" +
+                "^FT115,254^A0N,23,25^FH\\^CI28^FD" + valor + "^FS^CI27\n" +  // Valor
+                "^FT125,114^A0N,39,51^FH\\^CI28^FD" + pesokg + "kg^FS^CI27\n" +  // Peso
+                "^FT30,33^A0N,23,23^FH\\^CI28^FD" + dataFormatada + "^FS^CI27\n" +  // Data formatada
+                "^FT30,55^A0N,23,23^FH\\^CI28^FD" + horaFormatada + "^FS^CI27\n" +  // Hora formatada
+                "^PQ1,0,1,Y\n" +
+                "^XZ";
 
         // Enviar o comando ZPL para a impressora
        imprimirViaUSB(zpl);

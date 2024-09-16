@@ -57,7 +57,7 @@
         <p id="pesoCapturado" th:text="${pesoCapturado} + 'kg'" class="peso-destacado"></p>
     </div>
 
-    <form action="#" th:action="@{/balanca/imprimirZPL}" th:object="${balanca}" method="post">
+    <form action="#" th:action="@{/balanca/imprimir}" th:object="${balanca}" method="post">
 
         <div class="form-group">
             <label for="destino">Destino:</label>
