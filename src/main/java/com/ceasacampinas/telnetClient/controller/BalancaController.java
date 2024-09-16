@@ -51,6 +51,8 @@ public class BalancaController {
        
     	 //BigDecimal pesoCapturado = capturarPeso();  // Chama o método de teste para capturar o peso
     	BigDecimal pesoCapturado = telnetClient.capturarPeso(); // metodo correto
+    	
+    	
     	 // BigDecimal peso = new BigDecimal(pesoCapturado).divide(BigDecimal.valueOf(1000));
         // Instância de Balanca com valores padrão (caso queira preencher alguns campos previamente)
         Balanca balanca = new Balanca();
@@ -59,9 +61,12 @@ public class BalancaController {
         balanca.setContador(new BigDecimal(1));  // Exemplo de contador padrão
 
         System.out.println("Peso capturado no controller: "+pesoCapturado);
+        
+        BigDecimal pesokg = pesoCapturado.divide(BigDecimal.valueOf(1000));
+        
         // Adiciona a instância ao modelo para que o formulário a utilize
         model.addAttribute("balanca", balanca);
-        model.addAttribute("pesoCapturado", pesoCapturado);  // Passa o peso capturado para o modelo
+        model.addAttribute("pesoCapturado", pesokg);  // Passa o peso capturado para o modelo
 
         return "balanca"; // Nome da página HTML do formulário
     }
@@ -74,6 +79,9 @@ public class BalancaController {
                                Model model) {
         // Chama o service para capturar o peso da balança
         BigDecimal pesoCapturado = telnetClient.capturarPeso();
+        
+        System.out.println("Peso capturado para o front: " +pesoCapturado);
+        
         if (pesoCapturado == null) {
             System.out.println("Erro peso não capturado");
         }

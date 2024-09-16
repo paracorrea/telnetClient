@@ -5,64 +5,105 @@
     <title>Cadastro de Pesagem</title>
     <style>
         /* Estilo personalizado para destacar o peso capturado */
-        .peso-destacado {
-            font-size: 2em;            /* Aumenta o tamanho da fonte */
-            font-weight: bold;         /* Negrito */
-            color: #333;               /* Cor cinza escuro */
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); /* Efeito de relevo */
-            margin-top: 20px;          /* Espaçamento superior */
-        }
-        .peso-label {
-            font-size: 1.2em;
-            color: #555;
-        }
+		/* Estilo personalizado para destacar o peso capturado */
+		.peso-destacado {
+		    font-size: 2em;            /* Aumenta o tamanho da fonte */
+		    font-weight: bold;         /* Negrito */
+		    color: #333;               /* Cor cinza escuro */
+		    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); /* Efeito de relevo */
+		    margin-top: 20px;          /* Espaçamento superior */
+		    text-align: center;        /* Centraliza o peso */
+		}
 
-        /* Estilo dos campos de captura */
-        .campo-captura {
-            width: 100%;               /* Largura total do campo */
-            padding: 10px;             /* Aumenta o espaço dentro do campo */
-            font-size: 1.1em;          /* Aumenta o tamanho da fonte */
-            margin-bottom: 15px;       /* Espaçamento entre os campos */
-            border: 1px solid #ccc;    /* Bordas suaves */
-            border-radius: 4px;        /* Bordas arredondadas */
-        }
+		/* Centralizar o texto da label do peso */
+		.peso-label {
+		    font-size: 1.2em;
+		    color: #555;
+		    text-align: center;        /* Centraliza o texto da label */
+		    display: block;            /* Garante que a label ocupe toda a largura */
+		}
 
-        /* Estilo do container dos campos */
-        .form-group {
-            margin-bottom: 20px;       /* Espaçamento entre os campos */
-        }
+		/* Estilo dos campos de captura */
+		.campo-captura {
+		    width: 100%;               /* Largura total do campo */
+		    padding: 15px;             /* Aumenta o espaço dentro do campo */
+		    font-size: 1.5em;          /* Aumenta o tamanho da fonte */
+		    margin-bottom: 20px;       /* Aumenta o espaçamento entre os campos */
+		    border: 2px solid #ccc;    /* Aumenta a espessura das bordas */
+		    border-radius: 6px;        /* Bordas arredondadas */
+		}
 
-        /* Estilo do botão */
-        button {
-            padding: 10px 20px;        /* Tamanho do botão */
-            font-size: 1.1em;          /* Tamanho da fonte do botão */
-            background-color: #007bff; /* Cor de fundo do botão */
-            color: white;              /* Cor do texto do botão */
-            border: none;              /* Remove bordas padrão */
-            border-radius: 4px;        /* Bordas arredondadas */
-            cursor: pointer;           /* Cursor do mouse ao passar sobre o botão */
-        }
+		/* Centralizar o formulário */
+		form {
+		    max-width: 600px;          /* Define a largura máxima do formulário */
+		    margin: 0 auto;            /* Centraliza o formulário horizontalmente */
+		    padding: 20px;             /* Adiciona um espaçamento interno */
+		    border: 1px solid #ddd;    /* Adiciona uma borda ao redor do formulário */
+		    border-radius: 8px;        /* Bordas arredondadas */
+		    background-color: #f9f9f9; /* Fundo suave para o formulário */
+		}
 
-        button:hover {
-            background-color: #0056b3; /* Cor de fundo ao passar o mouse sobre o botão */
-        }
+		/* Estilo do container dos campos */
+		.form-group {
+		    margin-bottom: 25px;       /* Aumenta o espaçamento entre os campos */
+		}
+
+		/* Estilo do botão */
+		button {
+		    padding: 15px 30px;        /* Aumenta o tamanho do botão */
+		    font-size: 1.5em;          /* Aumenta o tamanho da fonte do botão */
+		    background-color: #007bff; /* Cor de fundo do botão */
+		    color: white;              /* Cor do texto do botão */
+		    border: none;              /* Remove bordas padrão */
+		    border-radius: 6px;        /* Bordas arredondadas */
+		    cursor: pointer;           /* Cursor do mouse ao passar sobre o botão */
+		}
+
+		button:hover {
+		    background-color: #0056b3; /* Cor de fundo ao passar o mouse sobre o botão */
+		}
+
+		/* Melhorar margens da página */
+		body {
+		    padding: 20px;             /* Adiciona espaçamento ao redor do conteúdo */
+		    margin: 0 auto;            /* Centraliza o conteúdo da página */
+		    max-width: 1200px;         /* Limita a largura máxima da página */
+		}
+		
+		/* Centraliza o texto e define o alinhamento */
+		.centralizado {
+		    text-align: center;           /* Centraliza o texto */
+		    font-size: 2em;               /* Aumenta o tamanho da fonte do título */
+		    margin-bottom: 20px;          /* Espaçamento inferior */
+		}
+
+		.centralizado span {
+		    font-size: 0.5em;             /* Define o tamanho menor para a segunda linha */
+		    font-weight: normal;          /* Deixa a segunda linha com peso de fonte normal */
+		    display: block;               /* Garante que o texto esteja em uma nova linha */
+		    margin-top: 10px;             /* Adiciona espaçamento superior à segunda linha */
+		}
+
     </style>
 </head>
 <body>
-    <h1>Cadastro de Pesagem</h1>
+	<h1 class="centralizado">
+	    Cadastro de Pesagem<br>
+	    <span>Pressione a tecla F5 para atualizar o peso</span>
+	</h1>
 
     <!-- Exibe o peso capturado com destaque -->
     <div>
-        <label for="pesoCapturado" class="peso-label">Peso Capturado:</label>
+        <label for="pesoCapturado" class="peso-label"></label>
         <p id="pesoCapturado" th:text="${pesoCapturado} + 'kg'" class="peso-destacado"></p>
     </div>
 
     <form action="#" th:action="@{/balanca/imprimir}" th:object="${balanca}" method="post">
 
-        <div class="form-group">
-            <label for="destino">Destino:</label>
-            <input type="text" id="destino" th:field="*{destino}" class="campo-captura" required />
-        </div>
+		<div class="form-group">
+		    <label for="destino">Destino:</label>
+		    <input type="text" id="destino" th:field="*{destino}" class="campo-captura" maxlength="28" required />
+		</div>
 
          <div class="form-group">
             <label for="placa">Placa:</label>
