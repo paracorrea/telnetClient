@@ -122,21 +122,7 @@
     
     <p th:text="${mensagem}"></p>
     
- <script>
-        // Aplica máscara e valida a placa no formato "AAA0000"
-        const placaInput = document.getElementById('placa');
-
-        placaInput.addEventListener('input', function (e) {
-            let value = e.target.value.toUpperCase(); // Converte para maiúsculas
-            value = value.replace(/[^A-Z0-9]/g, '');  // Remove qualquer caractere que não seja letra ou número
-            
-            // Aplica a máscara para três letras seguidas de quatro números
-            if (value.length > 3) {
-                value = value.slice(0, 3) + value.slice(3).replace(/[^0-9]/g, '');  // Limita a entrada a três letras e quatro dígitos
-            }
-            e.target.value = value.slice(0, 7);  // Limita o valor a 7 caracteres (AAA0000)
-        });
-    </script>    
+ 
 <script>
     document.getElementById('valor').addEventListener('input', function (e) {
         let value = e.target.value;
