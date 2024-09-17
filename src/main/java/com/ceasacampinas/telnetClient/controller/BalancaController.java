@@ -74,6 +74,34 @@ public class BalancaController {
 
         return "balanca"; // Nome da página HTML do formulário
     }
+    
+    @PostMapping("/balanca/imprimir")
+    public String imprimirBalanca(@ModelAttribute Balanca balanca, Model model) {
+        // Preenche os dados automáticos do sistema
+       
+    	balanca.setPeso(telnetClient.capturarPeso());
+        
+      
+     
+        balanca.setDataPesagem(LocalDateTime.now()); // Captura a data e hora atuais
+        balanca.setContador(new BigDecimal(1)); // Exemplo de contador
+
+        // Envia para impressão
+        telnetClient.imprimirEtiqueta(
+        		 balanca.getPlaca(),
+                 balanca.getDestino(),
+                 balanca.getValor().toString(),
+                 balanca.getDataPesagem(),
+                 balanca.getPeso()
+            
+        );
+
+        // Retorna uma mensagem de sucesso
+        model.addAttribute("mensagem", "Etiqueta impressa com sucesso!");
+        return "redirect:/balanca";
+    }
+    
+    
 	/*
 	 * @PostMapping("/capturar") public String capturarPeso(@RequestParam String
 	 * proprietarioCaminhao,
@@ -106,31 +134,7 @@ public class BalancaController {
    
 
     
-    @PostMapping("/balanca/imprimir")
-    public String imprimirBalanca(@ModelAttribute Balanca balanca, Model model) {
-        // Preenche os dados automáticos do sistema
-       
-    	balanca.setPeso(telnetClient.capturarPeso());
-        
-      
-     
-        balanca.setDataPesagem(LocalDateTime.now()); // Captura a data e hora atuais
-        balanca.setContador(new BigDecimal(1)); // Exemplo de contador
-
-        // Envia para impressão
-        telnetClient.imprimirEtiqueta(
-        		 balanca.getPlaca(),
-                 balanca.getDestino(),
-                 balanca.getValor().toString(),
-                 balanca.getDataPesagem(),
-                 balanca.getPeso()
-            
-        );
-
-        // Retorna uma mensagem de sucesso
-        model.addAttribute("mensagem", "Etiqueta impressa com sucesso!");
-        return "redirect:/balanca";
-    }
+   
     
 	/*
 	 * @PostMapping("/balanca/imprimirZPL") public String
