@@ -126,8 +126,8 @@ public class TelnetClient {
                 "^FT115,215^A0N,23,25^FH\\^CI28^FD" + placa + "^FS^CI27\n" +  // Placa do veículo
                 "^FT30,182^A0N,23,25^FH\\^CI28^FDDestino:^FS^CI27\n" +
                 "^FT115,182^A0N,23,25^FH\\^CI28^FD" + destino + "^FS^CI27\n" +  // Destino
-                "^FT30,255^A0N,28,29^FH\\^CI28^FDValor R$ :^FS^CI27\n" +
-                "^FT115,254^A0N,28,29^FH\\^CI28^FD" + valor + "^FS^CI27\n" +  // Valor
+                "^FT30,255^A0N,28,29^FH\\^CI28^FDValor R$:^FS^CI27\n" +
+                "^FT150,255^A0N,28,29^FH\\^CI28^FD" + valor + "^FS^CI27\n" +  // Valor
                 "^FT125,114^A0N,39,51^FH\\^CI28^FD" + pesokg + "kg^FS^CI27\n" +  // Peso
                 "^FT30,33^A0N,23,23^FH\\^CI28^FD" + dataFormatada + "^FS^CI27\n" +  // Data formatada
                 "^FT30,55^A0N,23,23^FH\\^CI28^FD" + horaFormatada + "^FS^CI27\n" +  // Hora formatada
@@ -197,20 +197,21 @@ public class TelnetClient {
 
 
     	    // Código ZPL gerado dinamicamente com os valores passados
-    	    String zpl = "^XA\n" +
-    	                 "^PW480\n" +
-    	                 "^LL320\n" +
-    	                 "^FT30,212^A0N,23,25^FH\\^CI28^FDPlaca:^FS^CI27\n" +
-    	                 "^FT115,215^A0N,23,25^FH\\^CI28^FD" + placa + "^FS^CI27\n" +  // Placa do veículo
-    	                 "^FT30,182^A0N,23,25^FH\\^CI28^FDDestino:^FS^CI27\n" +
-    	                 "^FT115,182^A0N,23,25^FH\\^CI28^FD" + destino + "^FS^CI27\n" +  // Destino
-    	                 "^FT30,255^A0N,23,25^FH\\^CI28^FDValor:^FS^CI27\n" +
-    	                 "^FT115,254^A0N,23,25^FH\\^CI28^FD" + valor + "^FS^CI27\n" +  // Valor
-    	                 "^FT125,114^A0N,39,51^FH\\^CI28^FD" + peso + "kg^FS^CI27\n" +  // Peso
-    	                 "^FT30,33^A0N,23,23^FH\\^CI28^FD" + dataFormatada + "^FS^CI27\n" +  // Data formatada
-    	                 "^FT30,55^A0N,23,23^FH\\^CI28^FD" + horaFormatada + "^FS^CI27\n" +  // Hora formatada
-    	                 "^PQ1,0,1,Y\n" +
-    	                 "^XZ";
+        String zpl = "^XA\n" +
+                "^PW480\n" +
+                "^LL320\n" +
+                "^FT30,212^A0N,23,25^FH\\^CI28^FDPlaca:^FS^CI27\n" +
+                "^FT115,215^A0N,23,25^FH\\^CI28^FD" + placa + "^FS^CI27\n" +  // Placa do veículo
+                "^FT30,182^A0N,23,25^FH\\^CI28^FDDestino:^FS^CI27\n" +
+                "^FT115,182^A0N,23,25^FH\\^CI28^FD" + destino + "^FS^CI27\n" +  // Destino
+                "^FT30,255^A0N,28,29^FH\\^CI28^FDValor R$ :^FS^CI27\n" +
+                "^FT115,300^A0N,28,29^FH\\^CI28^FD" + valor + "^FS^CI27\n" +  // Valor
+                "^FT125,114^A0N,39,51^FH\\^CI28^FD" + peso + "kg^FS^CI27\n" +  // Peso
+                "^FT30,33^A0N,23,23^FH\\^CI28^FD" + dataFormatada + "^FS^CI27\n" +  // Data formatada
+                "^FT30,55^A0N,23,23^FH\\^CI28^FD" + horaFormatada + "^FS^CI27\n" +  // Hora formatada
+                "^PQ2,0,1,Y\n" +
+                "^XZ";
+
 
     	    return zpl;
     	}
