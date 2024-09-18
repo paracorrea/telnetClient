@@ -3,6 +3,7 @@ package com.ceasacampinas.telnetClient.service;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.Socket;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -85,7 +86,7 @@ public class TelnetClient {
             
             if (!pesoFiltrado.isEmpty()) {
                 // Convertendo a string para BigDecimal, assumindo que o peso está em gramas e dividindo por 1000 para obter em kg
-                peso = new BigDecimal(pesoFiltrado).divide(BigDecimal.valueOf(1000));
+                peso = new BigDecimal(pesoFiltrado).divide(BigDecimal.valueOf(1000),0, RoundingMode.DOWN);
             }
             
             System.out.println("Peso recebido: " + peso);
@@ -105,7 +106,7 @@ public class TelnetClient {
        
     	 int contador = lerContador();
     	
-    	 BigDecimal pesokg = peso.divide(BigDecimal.valueOf(1000));  // Dividir por 1000 para converter gramas para kg
+    	 BigDecimal pesokg = peso.divide(BigDecimal.valueOf(1000),0, RoundingMode.DOWN);  // Dividir por 1000 para converter gramas para kg
     	
         if (pesokg == null) {
         	System.out.println("Erro na captura do peso");  // Tratar o caso de falha na captura do peso
@@ -125,12 +126,11 @@ public class TelnetClient {
                 "^FT115,215^A0N,23,25^FH\\^CI28^FD" + placa + "^FS^CI27\n" +  // Placa do veículo
                 "^FT30,182^A0N,23,25^FH\\^CI28^FDDestino:^FS^CI27\n" +
                 "^FT115,182^A0N,23,25^FH\\^CI28^FD" + destino + "^FS^CI27\n" +  // Destino
-                "^FT30,255^A0N,23,25^FH\\^CI28^FDValor:^FS^CI27\n" +
-                "^FT115,254^A0N,23,25^FH\\^CI28^FD" + valor + "^FS^CI27\n" +  // Valor
+                "^FT30,255^A0N,28,29^FH\\^CI28^FDValor R$ :^FS^CI27\n" +
+                "^FT115,254^A0N,28,29^FH\\^CI28^FD" + valor + "^FS^CI27\n" +  // Valor
                 "^FT125,114^A0N,39,51^FH\\^CI28^FD" + pesokg + "kg^FS^CI27\n" +  // Peso
                 "^FT30,33^A0N,23,23^FH\\^CI28^FD" + dataFormatada + "^FS^CI27\n" +  // Data formatada
                 "^FT30,55^A0N,23,23^FH\\^CI28^FD" + horaFormatada + "^FS^CI27\n" +  // Hora formatada
-                "^FT30,300^A0N,18,18^FH\\^CI28^FDContador: " + contador + "^FS^CI27\n" +  // Contador
                 "^PQ2,0,1,Y\n" +
                 "^XZ";
 

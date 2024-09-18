@@ -6,6 +6,7 @@ import com.ceasacampinas.telnetClient.service.TelnetClient;
 import java.beans.PropertyEditorSupport;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,7 +63,7 @@ public class BalancaController {
 
         System.out.println("Peso capturado no controller: "+pesoCapturado);
         
-        BigDecimal pesokg = pesoCapturado.divide(BigDecimal.valueOf(1000));
+        BigDecimal pesokg = pesoCapturado.divide(BigDecimal.valueOf(1000),0, RoundingMode.DOWN);
         
         // Adiciona a instância ao modelo para que o formulário a utilize
         model.addAttribute("balanca", balanca);
@@ -70,33 +71,6 @@ public class BalancaController {
 
         return "balanca"; // Nome da página HTML do formulário
     }
-    @PostMapping("/capturar")
-    public String capturarPeso(@RequestParam String proprietarioCaminhao,
-                               @RequestParam String motoristaCaminhao,
-                               @RequestParam String modeloCaminhao,
-                               @RequestParam String nomeBalanceiro,
-                               @RequestParam String placaVeiculo,
-                               Model model) {
-        // Chama o service para capturar o peso da balança
-        BigDecimal pesoCapturado = telnetClient.capturarPeso();
-        
-        System.out.println("Peso capturado para o front: " +pesoCapturado);
-        
-        if (pesoCapturado == null) {
-            System.out.println("Erro peso não capturado");
-        }
-
-        // Adiciona os dados ao modelo com nomes corretos para evitar sobrescrever
-        model.addAttribute("proprietarioCaminhao", proprietarioCaminhao);
-        model.addAttribute("motoristaCaminhao", motoristaCaminhao);
-        model.addAttribute("modeloCaminhao", modeloCaminhao);
-        model.addAttribute("nomeBalanceiro", nomeBalanceiro);
-        model.addAttribute("placaVeiculo", placaVeiculo);
-        model.addAttribute("pesoCapturado", pesoCapturado);
-
-        return "redirect:/balanca";  // Retorna à página com os dados
-    }
-
    
 
     
@@ -158,4 +132,33 @@ public class BalancaController {
         String valorFormatado = valor.replace(".", "").replace(",", ".");
         return new BigDecimal(valorFormatado);
     }
+    
+    @PostMapping("/capturar")
+    public String capturarPeso(@RequestParam String proprietarioCaminhao,
+                               @RequestParam String motoristaCaminhao,
+                               @RequestParam String modeloCaminhao,
+                               @RequestParam String nomeBalanceiro,
+                               @RequestParam String placaVeiculo,
+                               Model model) {
+        // Chama o service para capturar o peso da balança
+        BigDecimal pesoCapturado = telnetClient.capturarPeso();
+        
+        System.out.println("Peso capturado para o front: " +pesoCapturado);
+        
+        if (pesoCapturado == null) {
+            System.out.println("Erro peso não capturado");
+        }
+
+        // Adiciona os dados ao modelo com nomes corretos para evitar sobrescrever
+        model.addAttribute("proprietarioCaminhao", proprietarioCaminhao);
+        model.addAttribute("motoristaCaminhao", motoristaCaminhao);
+        model.addAttribute("modeloCaminhao", modeloCaminhao);
+        model.addAttribute("nomeBalanceiro", nomeBalanceiro);
+        model.addAttribute("placaVeiculo", placaVeiculo);
+        model.addAttribute("pesoCapturado", pesoCapturado);
+
+        return "redirect:/balanca";  // Retorna à página com os dados
+    }
+
+   
 }
