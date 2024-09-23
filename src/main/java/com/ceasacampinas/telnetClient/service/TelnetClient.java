@@ -1,5 +1,6 @@
 package com.ceasacampinas.telnetClient.service;
 
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
@@ -7,7 +8,6 @@ import java.math.RoundingMode;
 import java.net.Socket;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalAccessor;
 import java.util.Properties;
 
 import javax.print.PrintService;
@@ -17,15 +17,27 @@ import org.springframework.stereotype.Service;
 
 import com.itextpdf.io.IOException;
 
+import com.itextpdf.io.image.ImageDataFactory;
+import com.itextpdf.kernel.colors.ColorConstants;
+
 import com.itextpdf.kernel.geom.PageSize;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
-import com.itextpdf.layout.Document;
 
+import com.itextpdf.layout.Document;
+import com.itextpdf.layout.borders.Border;
+import com.itextpdf.layout.borders.SolidBorder;
+
+import com.itextpdf.layout.element.Cell;
 import com.itextpdf.layout.element.Image;
 import com.itextpdf.layout.element.Paragraph;
+import com.itextpdf.layout.element.Table;
+
 import com.itextpdf.layout.property.TextAlignment;
-import com.itextpdf.layout.property.UnitValue;
+
+import com.itextpdf.layout.property.VerticalAlignment;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 import javax.print.*;
 import javax.print.attribute.HashPrintRequestAttributeSet;
@@ -215,6 +227,89 @@ public class TelnetClient {
 
     	    return zpl;
     	}
+    
+ 
+    public void gerarPdfRelatorioNumerado(HttpServletResponse response, int numeroInicial, int quantidade) throws IOException, java.io.IOException {
+        PdfWriter writer = new PdfWriter(response.getOutputStream());
+        PdfDocument pdf = new PdfDocument(writer);
+        PageSize pageSize = PageSize.A4;
+        Document document = new Document(pdf, pageSize);
+
+        // Loop para gerar a quantidade de páginas
+        for (int i = numeroInicial; i < numeroInicial + quantidade; i++) {
+                        
+
+            // Criação do cabeçalho
+            Table headerTable = new Table(new float[]{4, 1}); // Definir 2 colunas (proporção 4:1)
+            headerTable.setWidth(500); // Ocupa 100% da largura da página
+
+            // Logo à esquerda
+            Image logo = new Image(ImageDataFactory.create("src/main/resources/logo4.png"));
+            logo.setWidth(130); // Largura de 4 cm (aproximado)
+            logo.setHeight(55); // Altura de 3 cm (aproximado)
+            Cell logoCell = new Cell().add(logo);
+            logoCell.setBorder(Border.NO_BORDER); // Sem borda
+            logoCell.setTextAlignment(TextAlignment.LEFT);
+            headerTable.addCell(logoCell);
+
+            // Numeração à direita
+            Cell numeroCell = new Cell().add(new Paragraph(" Nº " + i)
+            		
+                .setFontSize(14)
+                .setBold());
+            numeroCell.setBorder(new SolidBorder(1));
+            numeroCell.setPaddingRight(40);
+            
+            
+           // numeroCell.setBorderRadius(new BorderRadius(1));
+            // Sem borda ao redor do número
+            numeroCell.setMarginLeft(400 	);// Espaçamento interno
+            numeroCell.setTextAlignment(TextAlignment.RIGHT);
+            numeroCell.setVerticalAlignment(VerticalAlignment.MIDDLE); // Centralizado verticalmente
+            
+            
+            headerTable.addCell(numeroCell);
+
+            // Adicionar a tabela de cabeçalho ao documento
+            document.add(headerTable);
+
+            // Definir a largura das colunas para a área de pesagem e borda ao lado
+            float[] columnWidths = {150, 900}; // Proporção de 1:5 entre as colunas de pesagem e a borda ao lado
+
+            // Criar tabela para as pesagens e bordas ao lado
+            Table pesagemTable = new Table(columnWidths);
+            pesagemTable.setWidth(500); // Ocupa 100% da largura da página
+            pesagemTable.setMarginTop(50); // Espaçamento do topo
+
+            // Adicionar as quatro áreas de pesagem e bordas ao lado
+            for (int j = 1; j <= 4; j++) {
+                // Célula para a pesagem
+                Cell pesagemCell = new Cell().add(new Paragraph(j + "ª \nPESAGEM")
+                    .setFontSize(14)
+                    .setBold()
+                    .setFontColor(ColorConstants.GRAY)
+                    .setPaddingTop(45)
+                    .setTextAlignment(TextAlignment.CENTER));
+                pesagemCell.setHeight(150); // Altura de cada espaço para pesagem
+              
+                pesagemCell.setBorder(new SolidBorder(1)); // Borda ao redor de cada espaço de pesagem
+                pesagemTable.addCell(pesagemCell);
+
+                // Célula para a borda vazia ao lado
+                Cell bordaVaziaCell = new Cell().add(new Paragraph("")) // Célula vazia ao lado
+                    .setHeight(150) // Altura igual à das pesagens
+                    .setWidth(900)
+                    .setBorder(new SolidBorder(1)); // Borda ao redor da célula vazia
+                pesagemTable.addCell(bordaVaziaCell);
+            }
+
+            // Adicionar a tabela de pesagens ao documento
+            document.add(pesagemTable);
+        }
+
+        document.close();
+    }
+
 
     public  void salvarEmArquivo(String nomeArquivo, String conteudo) throws java.io.IOException {
         try (FileWriter writer = new FileWriter(nomeArquivo)) {

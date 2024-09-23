@@ -3,6 +3,8 @@ package com.ceasacampinas.telnetClient.controller;
 import com.ceasacampinas.telnetClient.domain.Balanca;
 import com.ceasacampinas.telnetClient.service.TelnetClient;
 
+import jakarta.servlet.http.HttpServletResponse;
+
 import java.beans.PropertyEditorSupport;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -159,6 +161,20 @@ public class BalancaController {
 
         return "redirect:/balanca";  // Retorna à página com os dados
     }
-
+    
+    @GetMapping("/formulario")
+    public String formulario() {
+    	return "formulario-impresso";
+    }
+    
+    @PostMapping("/gerar-formulario")
+    public void gerarFormulario(@RequestParam("numeroInicial") int numeroInicial, 
+                                @RequestParam("quantidade") int quantidade, 
+                                HttpServletResponse response) throws IOException {
+        // Chamar método que cria o PDF
+        telnetClient.gerarPdfRelatorioNumerado(response, numeroInicial, quantidade);
+    }
+    
+    
    
 }

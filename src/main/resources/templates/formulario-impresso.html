@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Sistema de Balança</title>
+</head>
+<body>
+<h2>Gerar Páginas com contador</h2>
+    <form action="/gerar-formulario" method="post" enctype="multipart/form-data">
+        <label for="numeroInicial">Entre com o número para iniciar o contador :</label>
+        <input type="number" id="numeroInicial" name="numeroInicial" min="1" value="1" required>
+        <br><br>
+        
+        <label for="quantidade">Qual a quantidade de páginas a ser gerada? </label>
+        <input type="number" id="quantidade" name="quantidade" min="1" value="10"  required>
+        <br><br>
+       
+        <br><br>
+        
+        <button type="submit">Gerar Relatório</button>
+    </form>
+</body>
+</html>
