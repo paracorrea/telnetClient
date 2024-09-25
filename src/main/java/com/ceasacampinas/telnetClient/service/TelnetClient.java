@@ -244,7 +244,8 @@ public class TelnetClient {
             headerTable.setWidth(500); // Ocupa 100% da largura da página
 
             // Logo à esquerda
-            Image logo = new Image(ImageDataFactory.create("src/main/resources/logo4.png"));
+           
+            Image logo = new Image(ImageDataFactory.create(getClass().getResource("/logo4.png")));
             logo.setWidth(130); // Largura de 4 cm (aproximado)
             logo.setHeight(55); // Altura de 3 cm (aproximado)
             Cell logoCell = new Cell().add(logo);

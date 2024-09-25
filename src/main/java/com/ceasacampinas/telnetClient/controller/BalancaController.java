@@ -173,6 +173,7 @@ public class BalancaController {
                                 HttpServletResponse response) throws IOException {
         // Chamar método que cria o PDF
         telnetClient.gerarPdfRelatorioNumerado(response, numeroInicial, quantidade);
+        
     }
     
     
